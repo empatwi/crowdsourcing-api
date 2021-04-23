@@ -16,11 +16,7 @@ classification_fields = api.model('Classification', {
 })
 
 tweet_fields = api.model('Tweet', {
-    'created_at': fields.DateTime(required=True),
     'tweet_content': fields.String(required=True),
-    'user_location': fields.String(required=False),
-    'keyword': fields.List(fields.String(), required=True),
-    'entities': fields.List(fields.String(), required=False),
     'classification': fields.List(fields.Nested(classification_fields))
 })
 
@@ -31,14 +27,34 @@ class Tweet(Resource):
         400: 'Bad request',
         500: 'Internal server error'
     })
-    @tweet_ns.doc(description='Endpoint to retrieve all tweets')
+    @tweet_ns.doc(description='Retrieves a random tweet')
     def get(self):
         return json.loads(dumps(col.aggregate([{
             '$project': {
-                '_id': 0,
                 'created_at': 0,
                 'keyword': 0,
                 'user_location': 0,
                 'entities': 0
             }
         }, {'$sample': {'size': 1}}]))), 200
+
+@tweet_ns.route('/<id>')
+class TweetClassification(Resource):
+    @tweet_ns.doc(responses={
+        200: 'OK',
+        400: 'Bad request',
+        404: 'Tweet not found',
+        500: 'Internal server error'
+    })
+    @tweet_ns.expect(classification_fields, validate=True)
+    @tweet_ns.doc(description='Sends classification data to database')
+    def put(self, id):
+        #TODO: {'_id': {'$oid': id}}
+        unclassified_tweet = json.loads(dumps(col.find({'_id': {'$oid': id}})))
+        if unclassified_tweet:
+            classified_json = request.get_json()
+            classification = classified_json['classification']
+            return json.loads(dumps(col.update({'_id': id}, {'classification': classification})))
+        else:
+            return 'Tweet not found', 404
+        
