@@ -1,9 +1,9 @@
 import json
 
-from .api import api
+from api import api
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-from .database.db import col
+from database.db import col
 from flask_restplus import Resource, fields, Namespace
 from flask import request
 

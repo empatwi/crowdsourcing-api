@@ -1,1 +1,1 @@
-web: src
+web: gunicorn src/main:app
