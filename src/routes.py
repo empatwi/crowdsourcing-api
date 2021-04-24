@@ -1,4 +1,3 @@
-import pymongo
 import json
 
 from api import api
@@ -30,14 +29,12 @@ class Tweet(Resource):
     })
     @tweet_ns.doc(description='Retrieves a random tweet')
     def get(self):
-        return json.loads(dumps(col.aggregate([{
-            '$project': {
-                'created_at': 0,
-                'keyword': 0,
-                'user_location': 0,
-                'entities': 0
-            }
-        }, {'$sample': {'size': 1}}]))), 200
+        return json.loads(dumps(col.aggregate([
+            {'$match': {
+                'classification.2': {'$exists': False}
+            }},
+            {'$sample': {'size': 1}}
+        ])))
 
 @tweet_ns.route('/<id>')
 class TweetClassification(Resource):
