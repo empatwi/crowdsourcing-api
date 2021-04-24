@@ -1,0 +1,1 @@
+web: $env:FLASK_APP="src" flask run
