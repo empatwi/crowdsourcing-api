@@ -3,6 +3,7 @@ import json
 
 from api import api
 from bson.json_util import dumps
+from bson.objectid import ObjectId
 from database.db import col
 from flask_restplus import Resource, fields, Namespace
 from flask import request, render_template, make_response, jsonify
@@ -49,12 +50,15 @@ class TweetClassification(Resource):
     @tweet_ns.expect(classification_fields, validate=True)
     @tweet_ns.doc(description='Sends classification data to database')
     def put(self, id):
-        #TODO: {'_id': {'$oid': id}}
-        unclassified_tweet = json.loads(dumps(col.find({'_id': {'$oid': id}})))
+        unclassified_tweet = json.loads(dumps(col.find({'_id': ObjectId(id)})))
+
         if unclassified_tweet:
-            classified_json = request.get_json()
-            classification = classified_json['classification']
-            return json.loads(dumps(col.update({'_id': id}, {'classification': classification})))
+            classification = request.get_json()
+            json.loads(dumps(col.update(
+                {'_id': ObjectId(id)}, 
+                { '$push': {'classification': classification}}
+            )))
+            return json.loads(dumps(col.find({'_id': ObjectId(id)})))
         else:
             return 'Tweet not found', 404
         
