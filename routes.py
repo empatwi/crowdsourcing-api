@@ -32,6 +32,10 @@ class Tweet(Resource):
         return json.loads(dumps(col.aggregate([
             {'$match': {
                 'classification.2': {'$exists': False}
+            }}, 
+            {'$project': {
+                '_id': {'$toString': '$_id'},
+                'tweet_content': 1
             }},
             {'$sample': {'size': 1}}
         ])))
