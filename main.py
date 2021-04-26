@@ -4,7 +4,7 @@ from flask import Flask
 from routes import tweet_ns
 
 app = Flask(__name__, instance_relative_config=True)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app)
 
 app.register_blueprint(bp)
 app.config['CORS_HEADERS'] = 'Content-Type'
