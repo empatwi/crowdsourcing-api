@@ -4,6 +4,7 @@ from api import api
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 from database.db import col
+from flask_cors import cross_origin
 from flask_restplus import Resource, fields, Namespace
 from flask import request
 
@@ -20,6 +21,7 @@ tweet_fields = api.model('Tweet', {
     'classification': fields.List(fields.Nested(classification_fields))
 })
 
+@cross_origin()
 @tweet_ns.route('/')
 class Tweet(Resource):
     @tweet_ns.doc(responses={
@@ -40,6 +42,7 @@ class Tweet(Resource):
             {'$sample': {'size': 1}}
         ])))
 
+@cross_origin()
 @tweet_ns.route('/<id>')
 class TweetClassification(Resource):
     @tweet_ns.doc(responses={
