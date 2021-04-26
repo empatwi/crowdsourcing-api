@@ -27,6 +27,7 @@ api.add_namespace(tweet_ns)
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Methods', 'PUT')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     return response
 
 if __name__ == "__main__":

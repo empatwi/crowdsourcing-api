@@ -61,6 +61,6 @@ class TweetClassification(Resource):
                 {'_id': ObjectId(id)}, 
                 { '$push': {'classification': classification}}
             )))
-            return json.loads(dumps(col.find({'_id': ObjectId(id)}))), 201
+            return json.loads(dumps(col.find({'_id': ObjectId(id)}))), 200
         else:
             return 'Tweet not found', 404
