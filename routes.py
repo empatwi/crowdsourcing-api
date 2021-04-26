@@ -1,4 +1,5 @@
 import json
+import logging
 
 from api import api
 from bson.json_util import dumps
@@ -21,7 +22,6 @@ tweet_fields = api.model('Tweet', {
     'classification': fields.List(fields.Nested(classification_fields))
 })
 
-@cross_origin()
 @tweet_ns.route('/')
 class Tweet(Resource):
     @tweet_ns.doc(responses={
@@ -31,6 +31,7 @@ class Tweet(Resource):
     })
     @tweet_ns.doc(description='Retrieves a random tweet')
     def get(self):
+        logging.warn('GET GET GET GET GET GET')
         return json.loads(dumps(col.aggregate([
             {'$match': {
                 'classification.2': {'$exists': False}
@@ -42,7 +43,6 @@ class Tweet(Resource):
             {'$sample': {'size': 1}}
         ])))
 
-@cross_origin()
 @tweet_ns.route('/<id>')
 class TweetClassification(Resource):
     @tweet_ns.doc(responses={
@@ -54,6 +54,7 @@ class TweetClassification(Resource):
     @tweet_ns.expect(classification_fields, validate=True)
     @tweet_ns.doc(description='Sends classification data to database')
     def put(self, id):
+        logging.warn('PUT PUT PUT PUT')
         unclassified_tweet = json.loads(dumps(col.find({'_id': ObjectId(id)})))
 
         if unclassified_tweet:
@@ -62,7 +63,14 @@ class TweetClassification(Resource):
                 {'_id': ObjectId(id)}, 
                 { '$push': {'classification': classification}}
             )))
-            return json.loads(dumps(col.find({'_id': ObjectId(id)})))
+            return json.loads(dumps(col.find({'_id': ObjectId(id)}))), 201
         else:
             return 'Tweet not found', 404
-        
+
+"""
+    def options(self, id):
+        logging.warn('OPTIONSSSSSSSSSSSSSSSSS')
+        return {'Allow' : 'PUT' }, 200, \
+        {'Access-Control-Allow-Origin': '*', \
+        'Access-Control-Allow-Methods' : 'PUT, GET'}
+        """
