@@ -4,6 +4,7 @@ import logging
 from api import api
 from bson.json_util import dumps
 from bson.objectid import ObjectId
+from utils.custom_fields import NullableBoolean
 from database.db import col
 from flask_cors import cross_origin
 from flask_restplus import Resource, fields, Namespace
@@ -14,7 +15,9 @@ tweet_ns = Namespace('tweet', description='Tweet related operations')
 # Model required by flask_restplus for expected data
 classification_fields = api.model('Classification', {
     'created_at': fields.DateTime(required=True),
-    'classification': fields.Boolean(required=True)
+    #'classification': fields.Boolean(required=True)
+    'classification': NullableBoolean(),
+    'reported': NullableBoolean()
 })
 
 tweet_fields = api.model('Tweet', {
@@ -57,10 +60,19 @@ class TweetClassification(Resource):
 
         if unclassified_tweet:
             classification = request.get_json()
-            json.loads(dumps(col.update(
-                {'_id': ObjectId(id)}, 
-                { '$push': {'classification': classification}}
-            )))
+            if classification['classification'] is not None:
+                json.loads(dumps(col.update(
+                    {'_id': ObjectId(id)}, 
+                    { '$push': {
+                        'created_at': classification['created_at'],
+                        'classification': classification['classification']
+                    }}
+                )))
+            elif classification['reported'] is not None:
+                json.loads(dumps(col.update(
+                    {'_id': ObjectId(id)},
+                    {'$push': {}}
+                )))
             return json.loads(dumps(col.find({'_id': ObjectId(id)}))), 200
         else:
             return 'Tweet not found', 404
