@@ -1,9 +1,9 @@
 import pymongo
 from decouple import config
 
-mongo = pymongo.MongoClient(config('MONGODB_ATLAS_CONNECTION_STRING_TEST'), connect=False)
+mongo = pymongo.MongoClient(config('MONGODB_ATLAS_CONNECTION_STRING_DEVELOPMENT'), connect=False)
 #Dev db
-#db = pymongo.database.Database(mongo, 'empatwi')
+db = pymongo.database.Database(mongo, 'empatwi')
 #Test db
-db = pymongo.database.Database(mongo, 'test')
+#db = pymongo.database.Database(mongo, 'test')
 col = pymongo.collection.Collection(db, 'tweet')

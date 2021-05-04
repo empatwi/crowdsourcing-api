@@ -1,9 +1,11 @@
 import json
+import logging
 
 from api import api
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 from database.db import col
+from flask_cors import cross_origin
 from flask_restplus import Resource, fields, Namespace
 from flask import request
 
@@ -32,11 +34,15 @@ class Tweet(Resource):
         return json.loads(dumps(col.aggregate([
             {'$match': {
                 'classification.2': {'$exists': False}
+            }}, 
+            {'$project': {
+                '_id': {'$toString': '$_id'},
+                'tweet_content': 1
             }},
             {'$sample': {'size': 1}}
         ])))
 
-@tweet_ns.route('/<id>')
+@tweet_ns.route('/<id>/')
 class TweetClassification(Resource):
     @tweet_ns.doc(responses={
         200: 'OK',
@@ -55,7 +61,6 @@ class TweetClassification(Resource):
                 {'_id': ObjectId(id)}, 
                 { '$push': {'classification': classification}}
             )))
-            return json.loads(dumps(col.find({'_id': ObjectId(id)})))
+            return json.loads(dumps(col.find({'_id': ObjectId(id)}))), 200
         else:
             return 'Tweet not found', 404
-        
