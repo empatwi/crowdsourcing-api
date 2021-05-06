@@ -1,11 +1,9 @@
 import json
-import logging
 
 from api import api
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 from database.db import col
-from flask_cors import cross_origin
 from flask_restplus import Resource, fields, Namespace
 from flask import request
 
