@@ -1,4 +1,5 @@
-# empatwi-crowdsourcing-api
+# empatwi
+## Crowdsourcing API
 Esse repositório contém a API back-end da plataforma Crowdsourcing do projeto Empatwi.
 Essa API é responsável por toda a conexão com o banco de dados, desde retornar um tweet aleatório para exibição quanto atualizar o registro de um tweet com o resultado da classificação.
 
