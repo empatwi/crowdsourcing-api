@@ -34,16 +34,17 @@ class Tweet(Resource):
     })
     @tweet_ns.doc(description='Retrieves a random tweet')
     def get(self):
-        return json.loads(dumps(col.aggregate([
-            {'$match': { '$or': [
-                {'classification.2': {'$exists': False}},
-                {'reported.2': {'$exists': False}}
-            ]}}, 
-            {'$project': {
-                '_id': {'$toString': '$_id'},
-                'tweet_content': 1
-            }},
-            {'$sample': {'size': 1}}
+        return json.loads(dumps(col.aggregate(
+            [
+                {'$match': { '$or': [
+                    {'classification.2': {'$exists': False}},
+                    {'reported.2': { '$exists': False }}
+                ]}}, 
+                {'$project': {
+                    '_id': {'$toString': '$_id'},
+                    'tweet_content': 1
+                }},
+                {'$sample': {'size': 1}}
         ])))
 
 @tweet_ns.route('/<id>/')
