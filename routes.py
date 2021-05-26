@@ -36,7 +36,7 @@ class Tweet(Resource):
     def get(self):
         return json.loads(dumps(col.aggregate(
             [
-                {'$match': { '$or': [
+                {'$match': { '$and': [
                     {'classification.2': {'$exists': False}},
                     {'reported.2': { '$exists': False }}
                 ]}}, 
